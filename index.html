@@ -12,155 +12,261 @@
             background-color: #f4f4f4;
             text-align: center;
             background: linear-gradient(45deg, #ff5f6d, #ffc371);
-
         }
+
         header {
             background-color: #333;
             color: white;
-            padding: 20px 0;
+            padding: 20px;
             font-size: 24px;
             font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
+
         header img {
             width: 100px;
             height: 100px;
-            display: block;
-            margin: 0 auto;
+            border-radius: 50%;
+            margin-right: 10px;
         }
+
+        /* Hamburger Menu Styles */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            position: absolute;
+            left: 20px;
+            top: 30px;
+        }
+
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background-color: white;
+        }
+
+        .menu {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            background-color: #333;
+            transition: 0.3s;
+            z-index: 1000;
+            padding-top: 60px;
+        }
+
+        .menu.active {
+            left: 0;
+        }
+
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu ul li {
+            padding: 10px;
+        }
+
+        .menu ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        .menu ul li a:hover {
+            background-color: #575757;
+        }
+
+        /* Close button */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
+
         .content {
             padding: 20px;
         }
+
         .image-section {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
+
         .image-section div {
             margin: 10px;
             width: 250px;
             text-align: center;
         }
+
         .image-section img {
             width: 100%;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
+
         .description {
             margin-top: 10px;
             font-size: 14px;
             color: #555;
         }
+
         .follow-section {
             margin: 40px 0;
             font-size: 20px;
         }
+
         .follow-section a {
             color: #e440d6;
             text-decoration: none;
         }
+
         footer {
             background-color: #333;
             color: white;
             padding: 10px 0;
-            position: relative;
         }
+
         footer p {
             margin: 0;
             font-size: 14px;
         }
-        .float{
-	position:fixed;
-	width:60px;
-	height:60px;
-	bottom:40px;
-	right:40px;
-	background-color:rgb(16, 207, 70);
-	color:#FFF;
-	border-radius:50px;
-	text-align:center;
-  font-size:30px;
-	box-shadow: 2px 2px 3px #999;
-  z-index:100;
-}
 
-.my-float{
-	margin-top:16px;
+        .float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: rgb(16, 207, 70);
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 100;
+        }
 
-}
+        .my-float {
+            margin-top: 16px;
+        }
+
+
     </style>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
-     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js" integrity="sha512-BdHyGtczsUoFcEma+MfXc71KJLv/cd+sUsUaYYf2mXpfG/PtBjNXsPo78+rxWjscxUYN2Qr2+DbeGGiJx81ifg==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 
     <!-- Header Section -->
     <header>
-        <img src="logo.png" alt="IT Boyzz Logo" style="border-radius: 50%;">
+        <!-- Hamburger Menu -->
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <img src="logo.png" alt="IT Boyzz Logo">
         <div>IT Boyzz</div>
     </header>
+
+    <!-- Side Menu -->
+    <nav id="menu" class="menu">
+        <span class="close-btn" onclick="toggleMenu()">&times;</span>
+        <ul>
+            <li><a href="termsandconditions.html">Terms and Conditions</a></li>
+            <li><a href="privacyandpolicy.html">Privacy And Policy</a></li>
+            <li><a href="announcements.html">Announcements</a></li>
+            <li><a href="games.html">GAMES</a></li>
+            <li><a href="https://www.instagram.com/it_boyzz.srec24/">Contact Us</a></li>
+        </ul>
+        <footer style="margin-top: 95%;">
+            <p>MADE LOVE ❤️ WITH IT BOYS SREC@24</p>
+        </footer>
+    </nav>
 
     <!-- Content Section -->
     <div class="content">
         <h2><span id="typed"></span></h2>
-    <div class="content">
         <div class="image-section">
             <!-- Random Images and Descriptions -->
             <div>
                 <img src="WhatsApp Image 2024-10-18 at 21.45.02_7bebbae9.jpg" alt="Team Image 1" style="border: #333 2px solid;">
                 <p class="description">IT BOYZZ @24 <br>THE UNBREAKABLE BOND </p>
             </div>
-    </div>
-    <br><h3>URAVUGAL 🫂</h3><br>
-    <div class="image-section">
+        </div>
+        <br><h3>URAVUGAL 🫂</h3><br>
+        <div class="image-section">
             <div>
-                <img src="dhanush.jpg" alt="Team Image 1" style="border: #333 2px solid;" >
+                <img src="dhanush.jpg" alt="Team Image 1" style="border: #333 2px solid;">
                 <p class="description">DHANUSH <br>THE GANG LEADER</p>
             </div>
             <div>
-                <img src="harneesh.jpg" alt="Team Image 1" style="border: #333 2px solid;" >
+                <img src="harneesh.jpg" alt="Team Image 1" style="border: #333 2px solid;">
                 <p class="description">HARNEESH <br>KADHAL MAANAN🥰</p>
             </div>
             <div>
-                <img src="karthi.jpg" alt="Team Image 1" style="border: #333 2px solid;" >
+                <img src="karthi.jpg" alt="Team Image 1" style="border: #333 2px solid;">
                 <p class="description">KARTHI <br>THE HERO💖</p>
             </div>
             <div>
-                <img src="barath.jpg" alt="Team Image 1" style="border: #333 2px solid;" >
+                <img src="barath.jpg" alt="Team Image 1" style="border: #333 2px solid;">
                 <p class="description">BARATH <br>ROMANTIC HERO💖</p>
             </div>
             <div>
-                <img src="DILIP.jpg" alt="Team Image 1" style="border: #333 2px solid;" >
+                <img src="DILIP.jpg" alt="Team Image 1" style="border: #333 2px solid;">
                 <p class="description">DILIP <br>MATHS TOPPER</p>
             </div>
             <div>
-                <img src="Screenshot 2024-10-19 184739.png" alt="Team Image 1" style="border: #333 2px solid;" >
-                <p class="description">DON ⚡LIVESH  <br>DON  ⚡︎</p>
+                <img src="Screenshot 2024-10-19 184739.png" alt="Team Image 1" style="border: #333 2px solid;">
+                <p class="description">DON ⚡LIVESH <br>DON ⚡︎</p>
             </div>
-            
-    </div>
-    <h5>STAY TUNED FOR MORE UPDATES <br>WITH REGARDS, <br><img src="WhatsApp Image 2024-10-17 at 16.04.05_a862612a.jpg" style="height: 100px; width: 100px; border-radius: 50%; display: inline-block; border: #333 3px solid;"><br>KARTHI</h5>
+        </div>
+        <h5>STAY TUNED FOR MORE UPDATES <br>WITH REGARDS, <br><img src="WhatsApp Image 2024-10-17 at 16.04.05_a862612a.jpg" style="height: 100px; width: 100px; border-radius: 50%; display: inline-block; border: #333 3px solid;"><br>KARTHI</h5>
 
-
-    <!-- Follow Us Section -->
-    <div class="follow-section">
-        <p>Follow us on <a href="https://www.instagram.com/it_boyzz.srec24/">Instagram</a> for more updates!</p>
+        <!-- Follow Us Section -->
+        <div class="follow-section">
+            <p>Follow us on <a href="https://www.instagram.com/it_boyzz.srec24/">Instagram</a> for more updates!</p>
+        </div>
     </div>
 
     <!-- Footer Section -->
     <footer>
         <p>MADE LOVE ❤️ WITH IT BOYS SREC@24</p>
     </footer>
-    <a href="https://www.instagram.com/its_me_karthik08" class="float" target="_blank" onclick="window.open('https://chat.whatsapp.com/FRu3owMzhBKLL1nvjec4Hj')">
+
+    <a href="https://chat.whatsapp.com/FRu3owMzhBKLL1nvjec4Hj" class="float" target="_blank">
         <i class="fa fa-whatsapp my-float"></i>
-        </a>
+    </a>
+
+    <script>
+        var typed = new Typed("#typed", {
+            strings: ["Our Awesome Team", "IT BOYZZ @24", "UNBREAKABLE BOND"],
+            typeSpeed: 60,
+            backSpeed: 30,
+            loop: true
+        });
+
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.classList.toggle("active");
+        }
+    </script>
 </body>
-<script>
-    var typed = new Typed("#typed", {
-        strings: ["Our Awesome Team", "IT BOYZZ @24", "UNBREAKABLE BOND"],
-        typeSpeed: 50,     // Speed in milliseconds to type each character
-        backSpeed: 25,     // Speed in milliseconds to delete each character
-        loop: true         // Loop the animation
-    });
-</script>
 </html>
