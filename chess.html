@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Cut Game - IT Boyzz</title>
+    <style>
+        body {
+            background: linear-gradient(45deg, #ff5f6d, #ffc371);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        #gameCanvas {
+            border: 2px solid #fff;
+            background-color: #222;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+        }
+
+        #lives {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+
+        #gameOver {
+            display: none;
+            font-size: 36px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #restartBtn {
+            display: none;
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+            position: absolute;
+            bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="lives">Lives: ❤️❤️❤️❤️❤️</div>
+    <div id="gameOver">Game Over!</div>
+    <a href="#" id="restartBtn">Restart Game</a>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const fruits = [];
+        const bombs = [];
+        let score = 0;
+        let lives = 5;
+        let gameOver = false;
+
+        // Function to create fruits
+        function createFruit() {
+            const fruitTypes = ['🍎', '🍌', '🍉', '🍓'];
+            const fruit = {
+                x: Math.random() * (canvas.width - 50),
+                y: -50,
+                type: fruitTypes[Math.floor(Math.random() * fruitTypes.length)],
+                speed: Math.random() * 2 + 2
+            };
+            fruits.push(fruit);
+        }
+
+        // Function to create bombs
+        function createBomb() {
+            const bomb = {
+                x: Math.random() * (canvas.width - 40),
+                y: -40,
+                speed: Math.random() * 2 + 2
+            };
+            bombs.push(bomb);
+        }
+
+        // Function to update lives display
+        function drawLives() {
+            const livesDiv = document.getElementById('lives');
+            livesDiv.innerHTML = 'Lives: ' + '❤️'.repeat(lives) + '💔'.repeat(5 - lives);
+        }
+
+        // Function to update score display
+        function drawScore() {
+            const scoreDiv = document.getElementById('score');
+            scoreDiv.innerHTML = 'Score: ' + score;
+        }
+
+        // Function to draw fruits and bombs
+        function drawObjects() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw fruits
+            fruits.forEach(fruit => {
+                ctx.font = '30px Arial';
+                ctx.fillText(fruit.type, fruit.x, fruit.y);
+                fruit.y += fruit.speed;
+            });
+
+            // Draw bombs
+            bombs.forEach(bomb => {
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                ctx.arc(bomb.x + 20, bomb.y + 20, 20, 0, Math.PI * 2);
+                ctx.fill();
+                bomb.y += bomb.speed;
+            });
+        }
+
+        // Function to handle game over
+        function endGame() {
+            gameOver = true;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('restartBtn').style.display = 'block';
+        }
+
+        // Function to update game state
+        function update() {
+            if (gameOver) return;
+
+            // Check for missed fruits and bombs
+            fruits.forEach((fruit, index) => {
+                if (fruit.y > canvas.height) {
+                    lives--;
+                    fruits.splice(index, 1);
+                    if (lives <= 0) {
+                        endGame();
+                    }
+                }
+            });
+
+            bombs.forEach((bomb, index) => {
+                if (bomb.y > canvas.height) {
+                    bombs.splice(index, 1);
+                }
+            });
+
+            drawObjects();
+            drawLives();
+            drawScore();
+            requestAnimationFrame(update);
+        }
+
+        // Function to handle clicks on the canvas
+        canvas.addEventListener('click', (event) => {
+            if (gameOver) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // Check if a fruit was sliced
+            fruits.forEach((fruit, index) => {
+                const fruitX = fruit.x;
+                const fruitY = fruit.y - 30; // Adjust for text height
+                if (x >= fruitX && x <= fruitX + 50 && y >= fruitY && y <= fruitY + 50) {
+                    score++;
+                    fruits.splice(index, 1);
+                    drawScore(); // Update the score display
+                }
+            });
+
+            // Check if a bomb was sliced
+            bombs.forEach((bomb, index) => {
+                const bombX = bomb.x;
+                const bombY = bomb.y;
+                if (x >= bombX && x <= bombX + 40 && y >= bombY && y <= bombY + 40) {
+                    endGame();
+                }
+            });
+        });
+
+        // Restart game button functionality
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Main game loop
+        setInterval(() => {
+            if (!gameOver) {
+                createFruit();
+                if (Math.random() < 0.2) createBomb(); // 20% chance to create a bomb
+            }
+        }, 1000);
+
+        update();
+    </script>
+</body>
+</html>

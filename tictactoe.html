@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Boyzz Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(45deg, #ff5f6d, #ffc371);
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+            margin: 0 auto;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            cursor: pointer;
+            border: 2px solid #333;
+            transition: background-color 0.3s;
+        }
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .reset {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ff5f6d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .reset:hover {
+            background-color: #ff3e4e;
+        }
+        .mode-select {
+            margin-bottom: 20px;
+        }
+        .thinking {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff5f6d;
+        }
+        .spinner {
+            display: none;
+            margin-top: 10px;
+        }
+        .spinner div {
+            width: 10px;
+            height: 10px;
+            margin: 0 2px;
+            border-radius: 50%;
+            background: #ff5f6d;
+            animation: bounce 0.6s infinite alternate;
+        }
+        .spinner div:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .spinner div:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>IT Boyzz Tic Tac Toe</h1>
+        <div class="mode-select">
+            <button id="twoPlayerBtn">2 Players</button>
+            <button id="onePlayerBtn">1 Player</button>
+        </div>
+        <div class="board" id="board" style="display: none;">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div class="status" id="status"></div>
+        <div class="thinking" id="thinking" style="display: none;">Computer is thinking...</div>
+        <div class="spinner" id="spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <button class="reset" id="resetBtn" style="display: none;">Reset Game</button>
+    </div>
+
+    <script>
+        const board = document.getElementById("board");
+        const statusDisplay = document.getElementById("status");
+        const resetButton = document.getElementById("resetBtn");
+        const onePlayerBtn = document.getElementById("onePlayerBtn");
+        const twoPlayerBtn = document.getElementById("twoPlayerBtn");
+        const thinkingDisplay = document.getElementById("thinking");
+        const spinner = document.getElementById("spinner");
+
+        let currentPlayer = "X";
+        let gameActive = false;
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+        let isSinglePlayer = false;
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        onePlayerBtn.addEventListener("click", () => {
+            isSinglePlayer = true;
+            startGame();
+        });
+
+        twoPlayerBtn.addEventListener("click", () => {
+            isSinglePlayer = false;
+            startGame();
+        });
+
+        function startGame() {
+            board.style.display = "grid";
+            resetButton.style.display = "block";
+            gameActive = true;
+            currentPlayer = "X";
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            statusDisplay.textContent = `It's ${currentPlayer}'s turn.`;
+            thinkingDisplay.style.display = "none";
+            spinner.style.display = "none";
+
+            document.querySelectorAll(".cell").forEach(cell => {
+                cell.textContent = "";
+                cell.addEventListener("click", handleCellClick);
+            });
+        }
+
+        function handleCellClick(event) {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute("data-index"));
+
+            if (gameState[clickedCellIndex] !== "" || !gameActive) {
+                return;
+            }
+
+            gameState[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+
+            checkWinner();
+
+            if (isSinglePlayer && gameActive) {
+                computerTurn();
+            }
+        }
+
+        function checkWinner() {
+            let roundWon = false;
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (gameState[a] === "" || gameState[b] === "" || gameState[c] === "") {
+                    continue;
+                }
+                if (gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusDisplay.textContent = `Player ${currentPlayer} wins! 🎉`;
+                gameActive = false;
+                return;
+            }
+
+            if (!gameState.includes("")) {
+                statusDisplay.textContent = "It's a draw! 🤝";
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusDisplay.textContent = `It's ${currentPlayer}'s turn.`;
+        }
+
+        function computerTurn() {
+            thinkingDisplay.style.display = "block";
+            spinner.style.display = "flex";
+
+            setTimeout(() => {
+                const emptyCells = gameState.map((value, index) => value === "" ? index : null).filter(value => value !== null);
+                const randomCellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                gameState[randomCellIndex] = "O";
+                document.querySelector(`.cell[data-index='${randomCellIndex}']`).textContent = "O";
+                checkWinner();
+                thinkingDisplay.style.display = "none";
+                spinner.style.display = "none";
+            }, 1000); // Delay for 1 second to simulate thinking time
+        }
+
+        function resetGame() {
+            startGame();
+        }
+
+        resetButton.addEventListener("click", resetGame);
+    </script>
+
+</body>
+</html>
