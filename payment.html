@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Gateway</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #FF8A00, #FF0080); /* Gradient background */
+      color: #fff;
+    }
+
+    #payment-container {
+      width: 100%;
+      max-width: 800px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 18px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .processing {
+      font-size: 20px;
+      color: #28a745;
+      text-align: center;
+    }
+
+    .success {
+      font-size: 24px;
+      color: green;
+    }
+
+    .success img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .redirect-popup {
+      font-size: 20px;
+      color: #333;
+      margin-top: 20px;
+    }
+
+    .redirect-popup p {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .redirect-popup button {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .heart-symbol {
+      font-size: 18px;
+      color: #ff4081;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .heart-symbol::before {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="payment-container">
+    <div id="payment-methods">
+      <h1>Select Payment Method</h1>
+      <button onclick="showPaymentForm('card')">Credit/Debit Card</button>
+      <button onclick="showPaymentForm('upi')">UPI</button>
+      <button onclick="showPaymentForm('bank')">Banking</button>
+    </div>
+
+    <!-- Payment Form -->
+    <div id="payment-form" class="hidden"></div>
+
+    <!-- Enter Amount Section -->
+    <div id="amount-section" class="hidden">
+      <h1>Enter Amount to Pay</h1>
+      <input type="number" id="amount" placeholder="Enter amount" min="1" required>
+      <button onclick="proceedToPayment()">Proceed to Pay</button>
+    </div>
+
+    <!-- Processing Animation -->
+    <div id="processing" class="hidden">
+      <p class="processing">We are processing your payment...</p>
+    </div>
+
+    <!-- Success Message -->
+    <div id="success" class="hidden">
+      <p class="success">
+        <img src="https://img.icons8.com/ios-filled/50/28a745/checkmark.png" alt="Success">
+        Your payment has been successfully received. Thank you!
+      </p>
+    </div>
+
+    <!-- Redirect Pop-up -->
+    <div id="redirect-popup" class="hidden redirect-popup">
+      <p>Your payment was successful. You will be redirected to the main page.</p>
+      <button onclick="redirectToMain()">Redirect Now</button>
+    </div>
+  </div>
+
+  <!-- Heart Symbol and @itboys srec24 -->
+  <div class="heart-symbol" style="color: wheat; font-weight: bolder; font-size: large; font-family: Arial, Helvetica, sans-serif;">
+    Made with ❤️ by Karthi <br>IT Boyzz @ SREC24
+    <br> Follow me on ig<p onclick="window.open('https://www.instagram.com/its_me_karthik08/', '_blank');" style="color: #fff; text-decoration: underline; cursor: pointer; display: inline;">
+        @its_me_karthik08
+    </p>
+  </div>
+
+  <script>
+    function showPaymentForm(method) {
+      const paymentForm = document.getElementById('payment-form');
+      const paymentMethods = document.getElementById('payment-methods');
+      const amountSection = document.getElementById('amount-section');
+      
+      // Hide the "Select Payment Method" section after a payment method is selected
+      paymentMethods.classList.add('hidden');
+
+      let formHTML = '';
+
+      if (method === 'card') {
+        formHTML = `
+          <h1>Enter Credit/Debit Card Details</h1>
+          <input type="text" id="card-number" placeholder="Card Number" maxlength="16" oninput="validateCardInput(event)" required>
+          <input type="text" id="expiry-date" placeholder="MM/YY" maxlength="5" oninput="addSlash(this)" required>
+          <input type="password" id="cvv" placeholder="CVV" maxlength="3" oninput="validateCardInput(event)" required>
+          <button onclick="validateCard()">Proceed</button>
+        `;
+      } else if (method === 'upi') {
+        formHTML = `
+          <h1>Enter UPI Details</h1>
+          <input type="text" id="upi-id" placeholder="UPI ID (e.g., example@upi)" required>
+          <button onclick="validateUPI()">Proceed</button>
+        `;
+      } else if (method === 'bank') {
+        formHTML = `
+          <h1>Select Bank</h1>
+          <select id="bank-select" onchange="showIFSCInput()" required>
+              <option value="SBI">State Bank of India</option>
+  <option value="HDFC">HDFC Bank</option>
+  <option value="ICICI">ICICI Bank</option>
+  <option value="Axis">Axis Bank</option>
+  <option value="PNB">Punjab National Bank (PNB)</option>
+  <option value="BOB">Bank of Baroda</option>
+  <option value="Canara">Canara Bank</option>
+  <option value="UBI">Union Bank of India</option>
+  <option value="BOI">Bank of India</option>
+  <option value="Kotak">Kotak Mahindra Bank</option>
+  <option value="YesBank">Yes Bank</option>
+  <option value="IndianBank">Indian Bank</option>
+  <option value="IDFCFirst">IDFC First Bank</option>
+  <option value="RBL">RBL Bank</option>
+  <option value="SIB">South Indian Bank</option>
+  <option value="KVB">Karur Vysya Bank</option>
+  <option value="IndusInd">IndusInd Bank</option>
+  <option value="Federal">Federal Bank</option>
+  <option value="Vijaya">Vijaya Bank</option>
+  <option value="Allahabad">Allahabad Bank</option>
+  <option value="ShreeMahesh">Shree Mahesh Bank</option>
+  <option value="Central">Central Bank of India</option>
+  <option value="UCO">UCO Bank</option>
+  <option value="BankMaharashtra">Bank of Maharashtra</option>
+  <option value="OBC">Oriental Bank of Commerce</option>
+  <option value="IOB">Indian Overseas Bank</option>
+  <option value="StandardChartered">Standard Chartered Bank</option>
+  <option value="Citibank">Citibank</option>
+  <option value="HSBC">HSBC Bank</option>
+  <option value="DBS">DBS Bank</option>
+  <option value="JPMorgan">JPMorgan Chase Bank</option>
+  <option value="Deutsche">Deutsche Bank</option>
+  <option value="BankAmerica">Bank of America</option>
+  <option value="Barclays">Barclays Bank</option>
+  <option value="RelianceCapital">Reliance Capital</option>
+  <option value="LICHousing">LIC Housing Finance</option>
+          </select>
+          <div id="ifsc-container" class="hidden">
+            <input type="text" id="ifsc-code" placeholder="Enter IFSC Code" maxlength="11" oninput="validateIFSCInput(event)" required>
+            <button onclick="validateBank()">Proceed</button>
+          </div>
+        `;
+      }
+
+      paymentForm.innerHTML = formHTML;
+      paymentForm.classList.remove('hidden');
+    }
+
+    function addSlash(input) {
+      if (input.value.length === 2 && !input.value.includes('/')) {
+        input.value += '/';
+      }
+    }
+
+    function validateCardInput(event) {
+      const value = event.target.value;
+      // Allow only digits
+      event.target.value = value.replace(/\D/g, '');
+    }
+
+    function validateCard() {
+      const cardNumber = document.getElementById('card-number').value;
+      const expiryDate = document.getElementById('expiry-date').value;
+      const cvv = document.getElementById('cvv').value;
+
+      if (cardNumber.length !== 16 || isNaN(cardNumber)) {
+        alert('Invalid card number. Must be 16 digits.');
+        return;
+      }
+
+      if (!expiryDate.includes('/')) {
+        alert('Invalid expiry date. Use MM/YY format.');
+        return;
+      }
+
+      if (cvv.length !== 3 || isNaN(cvv)) {
+        alert('Invalid CVV. Must be 3 digits.');
+        return;
+      }
+
+      proceedToAmount();
+    }
+
+    function validateUPI() {
+      const upiID = document.getElementById('upi-id').value;
+      if (!upiID.includes('@')) {
+        alert('Invalid UPI ID. Please include "@" in your ID.');
+      } else {
+        proceedToAmount();
+      }
+    }
+
+    function showIFSCInput() {
+      const bankSelect = document.getElementById('bank-select');
+      const ifscContainer = document.getElementById('ifsc-container');
+      if (bankSelect.value) {
+        ifscContainer.classList.remove('hidden');
+      } else {
+        ifscContainer.classList.add('hidden');
+      }
+    }
+
+    function validateIFSCInput(event) {
+      const value = event.target.value;
+      // Allow only valid IFSC Code format (11 characters)
+      event.target.value = value.replace(/[^A-Za-z0-9]/g, '');
+    }
+
+    function validateBank() {
+      const ifscCode = document.getElementById('ifsc-code').value;
+      if (ifscCode.length !== 11) {
+        alert('Invalid IFSC Code. Must be 11 characters.');
+      } else {
+        proceedToAmount();
+      }
+    }
+
+    function proceedToAmount() {
+      const paymentForm = document.getElementById('payment-form');
+      const amountSection = document.getElementById('amount-section');
+
+      paymentForm.classList.add('hidden');
+      amountSection.classList.remove('hidden');
+    }
+
+    function proceedToPayment() {
+      const amount = document.getElementById('amount').value;
+
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+
+      const amountSection = document.getElementById('amount-section');
+      const processing = document.getElementById('processing');
+
+      amountSection.classList.add('hidden');
+      processing.classList.remove('hidden');
+
+      // Simulate processing payment
+      setTimeout(function() {
+        processing.classList.add('hidden');
+        showSuccessPopup();
+      }, 5000); // Show success after 5 seconds
+    }
+
+    function showSuccessPopup() {
+      const success = document.getElementById('success');
+      success.classList.remove('hidden');
+
+      setTimeout(function() {
+        document.getElementById('redirect-popup').classList.remove('hidden');
+      }, 2000); // Show redirect popup after 2 seconds
+    }
+
+    function redirectToMain() {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
