@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Boyzz Login</title>
+  <style>
+    /* Global Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #ff7eb3, #ff758c, #ff6a6a);
+      background-size: 300% 300%;
+      animation: gradientShift 6s infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #ff6a6a;
+      outline: none;
+      box-shadow: 0 0 8px rgba(255, 106, 106, 0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background-color: #ff6a6a;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff3b3b;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .error, .success {
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>IT Boyzz Login</h1>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const validCredentials = [
+      { username: "karthi", password: "2006" },
+      { username: "it boyzz", password: "uravugal" }
+    ];
+
+    let lockoutTimer = 0;
+    let attempts = 0;
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const message = document.getElementById("message");
+
+      if (lockoutTimer > 0) {
+        message.className = "error";
+        message.innerText = `Too many failed attempts! Try again in ${lockoutTimer}s.`;
+        return;
+      }
+
+      const isValid = validCredentials.some(
+        (user) => user.username === username && user.password === password
+      );
+
+      if (isValid) {
+        message.className = "success";
+        message.innerText = "Login successful! Redirecting...";
+        setTimeout(() => {
+          window.location.href = "index.html"; // Redirect to your IT Boyzz website
+        }, 2000);
+      } else {
+        attempts++;
+        message.className = "error";
+        message.innerText = "Invalid username or password!";
+        lockoutTimer = 10 * attempts;
+
+        const interval = setInterval(() => {
+          lockoutTimer -= 1;
+          if (lockoutTimer <= 0) {
+            clearInterval(interval);
+            lockoutTimer = 0;
+            message.innerText = "Now try again.";
+          } else {
+            message.innerText = `Too many failed attempts! Try again in ${lockoutTimer}s.`;
+          }
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>
