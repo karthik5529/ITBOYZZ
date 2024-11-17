@@ -105,16 +105,27 @@
     .heart-symbol::before {
       margin-right: 8px;
     }
+
+
+
+
+@media (max-width: 768px) {
+  .pm {
+    display: block;
+    margin-top: 3%;
+  }
+}
   </style>
 </head>
 <body>
-  <div id="payment-container">
-    <div id="payment-methods">
+  <div id="payment-container" style="margin-bottom: 10%;">
+    <div id="payment-methods" >
       <h1>Select Payment Method</h1>
-      <button onclick="showPaymentForm('card')">Credit/Debit Card</button>
-      <button onclick="showPaymentForm('upi')">UPI</button>
-      <button onclick="showPaymentForm('bank')">Banking</button>
-    </div>
+      <center>
+      <button onclick="showPaymentForm('card')"class="pm">Credit/Debit Card</button>
+      <button onclick="showPaymentForm('upi')" class="pm">UPI</button>
+      <button onclick="showPaymentForm('bank')" class="pm">Banking</button>
+   </center> </div>
 
     <!-- Payment Form -->
     <div id="payment-form" class="hidden"></div>
